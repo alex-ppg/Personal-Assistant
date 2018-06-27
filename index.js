@@ -73,12 +73,50 @@ const _randomPrompt = () => {
   }
 }
 
-const _clickElement = async (selector) => {
-
+const _write = async (msg, bot, timeout) => {
+  await new Promise((resolve, reject) => setTimeout(() => {resolve()}, timeout * 1000));
+  let element = (bot?botMessageElement:userMessageElement).cloneNode(true);
+  // Reset its display style
+  element.style.display = 'inherit';
+  element.innerHTML = msg;
+  messageContainer.appendChild(element);
+  messageContainer.scrollTop = messageContainer.scrollHeight;
 }
 
-const _inputElement = async (selector, message) => {
+const _clickElement = async (selector, timeout) => {
+  await new Promise((resolve, reject) => setTimeout(() => {resolve()}, timeout * 1000));
+  const element = document.querySelector(selector);
+  element.click();
+  element.focus();
+  return Promise.resolve(true);
+}
 
+const _inputElement = async (selector, message, timeout) => {
+  await new Promise((resolve, reject) => setTimeout(() => {resolve()}, timeout * 1000));
+  // Simulate input event for filtering and Angular
+  const event = new Event('input', {
+      'bubbles': true,
+      'cancelable': true
+  });
+  await new Promise((resolve, reject) => setTimeout(() => {element.value = text.charAt(0);resolve();}, Math.random() * 100));
+  message = text.substring(1);
+  // We need to save the size because we edit the text directly and offset it by 1
+  let loopLength = text.length + 1;
+  for (let i = 1; i < loopLength; i++) {
+    await new Promise((resolve, reject) => setTimeout(() => {
+      // Fix for number inputs
+      if (message.charAt(0) === '.') {
+        element.value += text.substring(0,2);
+        text = text.substring(2);
+      } else {
+        element.value += text.charAt(0);
+        text = text.substring(1);
+      }
+      element.dispatchEvent(event);
+      resolve();
+    }, Math.random() * 100));
+  }
+  return Promise.resolve(true);
 }
 
 PA.init = (messageContainer, botMessage, userMessage, timeBreak) => {
@@ -109,13 +147,13 @@ PA.welcome = () => {
   if (localStorage.getItem('PA-first-time') === null) {
     logger.debug("First time user, showing welcome message")
     _writeTime();
-    _write(welcomeMessage);
-    _write(_randomPrompt());
+    _write(welcomeMessage, 1);
+    _write(_randomPrompt(), 2);
     localStorage.setItem('PA-first-time', 0);
   } else {
     logger.debug("Recurring user, showing time-aware message")
-    _write(_timeAwareWelcome());
-    _write(_randomPrompt());
+    _write(_timeAwareWelcome(), 1);
+    _write(_randomPrompt(), 2);
   }
 }
 
@@ -220,15 +258,15 @@ PA.evaluate = (msg, currentPath) => {
   return answer;
 }
 
-PA.actuate = (action) => {
+PA.actuate = async (action) => {
   if (action instanceof String) {
-
+    await _write(action, 1);
   } else {
     action.forEach((el) => {
       if (el.type === 1) {
-        _clickElement(el.selector);
+        await _clickElement(el.selector, el.timeout);
       } else {
-        _inputElement(el.selector, el.text);
+        await _inputElement(el.selector, el.text, el.timeout);
       }
     })
   }
