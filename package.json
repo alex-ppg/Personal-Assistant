@@ -1,0 +1,29 @@
+{
+  "name": "personal-assistant",
+  "version": "1.0.0",
+  "description": "An automated bot that you can teach to conversate with your users and control the website based on their input",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex-ppg/Personal-Assistant.git"
+  },
+  "keywords": [
+    "bot",
+    "conversation",
+    "AI"
+  ],
+  "author": "Alex Papageorgiou",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/alex-ppg/Personal-Assistant/issues"
+  },
+  "homepage": "https://github.com/alex-ppg/Personal-Assistant#readme",
+  "dependencies": {
+    "better-log": "^1.3.3",
+    "logplease": "^1.2.14",
+    "moment": "^2.22.2"
+  }
+}
